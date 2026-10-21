@@ -11,7 +11,7 @@ st.set_page_config(page_title="Lab Chemical Inventory", page_icon="🧪", layout
 UNIT_GROUPS = {
     "mg": ("mass", 0.001), "g": ("mass", 1), "kg": ("mass", 1000),
     "µL": ("volume", 0.001), "mL": ("volume", 1), "L": ("volume", 1000),
-    "items": ("count", 1),
+    "items": ("count", 1), "gal": ("volume", 3785.411784),
 }
 
 
