@@ -199,7 +199,7 @@ with manage_tab:
     st.subheader("Add a chemical")
     with st.form("add_chemical", clear_on_submit=True):
         name = st.text_input("Chemical name")
-        identifier = st.text_input("Identifier (optional)", placeholder="CAS, bottle ID, or shelf label")
+        identifier = st.text_input("Location", placeholder="Cabinet (Acid Storage 1 or 2, Flammable 1 or 2)")
         starting = st.number_input("Starting amount", min_value=0.0, value=0.0, step=1.0)
         unit = st.selectbox("Stock unit", list(UNIT_GROUPS))
         add = st.form_submit_button("Add chemical", type="primary", use_container_width=True)
