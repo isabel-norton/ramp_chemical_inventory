@@ -11,7 +11,8 @@ st.set_page_config(page_title="Lab Chemical Inventory", page_icon="🧪", layout
 UNIT_GROUPS = {
     "mg": ("mass", 0.001), "g": ("mass", 1), "kg": ("mass", 1000),
     "µL": ("volume", 0.001), "mL": ("volume", 1), "L": ("volume", 1000),
-    "items": ("count", 1), "gal": ("volume", 3785.411784),
+    "items": ("count", 1),
+    "gal": ("volume", 3785.411784),
 }
 
 
@@ -118,21 +119,23 @@ with log_tab:
     if not active:
         st.info("Add a chemical under Manage to get started.")
     else:
-        with st.form("usage_form", clear_on_submit=True):
-            selected = st.selectbox("Chemical", active, format_func=label)
-            unit = selected[4]
-            group = UNIT_GROUPS[unit][0]
-            choices = [u for u, (g, _) in UNIT_GROUPS.items() if g == group]
-            amount = st.number_input("Amount used", min_value=0.0, value=0.0, step=0.1, format="%.4f")
-            used_unit = st.selectbox("Unit", choices, index=choices.index(unit))
-            used_on = st.date_input("Date used", value=date.today())
-            note = st.text_input("Notes (optional)", placeholder="Experiment, user, or purpose")
-            submitted = st.form_submit_button("Save usage", type="primary", use_container_width=True)
+        # Keep widgets outside a form so Streamlit updates button state as the user types.
+        selected = st.selectbox("Chemical *", active, format_func=label)
+        unit = selected[4]
+        group = UNIT_GROUPS[unit][0]
+        choices = [u for u, (g, _) in UNIT_GROUPS.items() if g == group]
+        amount = st.number_input("Amount used *", min_value=0.0, value=0.0, step=0.1, format="%.4f")
+        used_unit = st.selectbox("Unit *", choices, index=choices.index(unit))
+        used_on = st.date_input("Date used *", value=date.today())
+        note = st.text_input("Your name *", placeholder="Enter your name")
+        valid = bool(selected and used_unit and used_on and amount > 0 and note.strip())
+        submitted = st.button("Save usage", type="primary", use_container_width=True, disabled=not valid)
+        st.caption("* Required fields. Enter an amount greater than zero and your name to enable Save usage.")
         current = remaining(selected, logs)
         st.caption(f"Current stock: {current:,.4f} {unit}")
         if submitted:
-            if amount <= 0:
-                st.error("Enter an amount greater than zero.")
+            if not valid:
+                st.error("Complete all required fields before saving.")
             elif to_base(amount, used_unit) > to_base(current, unit) + 1e-8:
                 st.error("This amount exceeds the remaining stock. Refresh the app if another user just logged usage.")
             else:
@@ -175,7 +178,7 @@ with inventory_tab:
 with history_tab:
     st.subheader("Usage history")
     if logs:
-        entries = [{"Log ID": r[0], "Chemical": r[2], "Date": r[3], "Amount": r[4], "Unit": r[5], "Notes": r[6]} for r in logs]
+        entries = [{"Log ID": r[0], "Chemical": r[2], "Date": r[3], "Amount": r[4], "Unit": r[5], "Used by": r[6]} for r in logs]
         df = pd.DataFrame(entries)
         st.dataframe(df, hide_index=True, use_container_width=True)
         st.download_button("Download history CSV", df.to_csv(index=False), "chemical_usage_history.csv", "text/csv", use_container_width=True)
