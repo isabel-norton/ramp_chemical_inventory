@@ -199,12 +199,12 @@ with manage_tab:
     st.subheader("Add a chemical")
     with st.form("add_chemical", clear_on_submit=True):
         name = st.text_input("Chemical name *")
-        company = st.text_input("Company it's from *")
+        company = st.text_input("Supplier *")
         product_number = st.text_input("Product number *", help="Enter this as text so letters and leading zeros are preserved.")
-        identifier = st.text_input("Identifier (optional)", placeholder="CAS, bottle ID, or shelf label")
+        identifier = st.text_input("Location", placeholder="Acid Storage 1 or 2, Flammable 1 or 2")
         starting = st.number_input("Starting amount", min_value=0.0, value=0.0, step=1.0)
         unit = st.selectbox("Stock unit", list(UNIT_GROUPS))
-        st.caption("* Required. The saved chemical name will be: Chemical name - Company - Product number")
+        st.caption("* Required. The saved chemical name will be: Chemical name - Supplier - Product number")
         add = st.form_submit_button("Add chemical", type="primary", use_container_width=True)
     if add:
         if not all(value.strip() for value in (name, company, product_number)):
